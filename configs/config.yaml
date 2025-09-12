@@ -1,0 +1,40 @@
+data:
+  raw_glob: "data/raw/*.*"     # รองรับ .csv หรือ .parquet
+  tz_source: "Asia/Bangkok"    # timezone ต้นทางของไฟล์ดิบ
+  tz_target: "UTC"             # ภายในระบบใช้ UTC
+  ensure_regular_5m: true      # เติมกริดเวลา 5 นาทีให้สม่ำเสมอ
+
+feature:
+  rsi_period: 14
+  ema_periods: [20, 50, 200]
+  atr_period: 14
+  return_lags: [1,3,6,12,24,48,96]  # จำนวนแท่งย้อนหลังของ logret
+
+label:
+  atr_mult_tp: 2.5
+  atr_mult_sl: 1.6
+  max_holding: 36
+  min_move_bps: 0
+
+split:
+  train_months: 12
+  valid_months: 3
+  test_months: 3
+  step_months: 3
+
+train:
+  seq_len: 96
+  batch_size: 1024
+  lr: 1e-3
+  max_epochs: 25
+  early_stop_patience: 5
+  class_weights: [1.0, 0.6, 1.0]   # [-1, 0, +1]
+  device: "cuda"                   # หรือ "cpu"
+
+trade:
+  proba_threshold: 0.55
+  fee_bps: 5            # 0.05%
+  slippage_bps: 2       # 0.02%
+  atr_mult_tp: 2.5
+  atr_mult_sl: 1.6
+  max_holding: 36
