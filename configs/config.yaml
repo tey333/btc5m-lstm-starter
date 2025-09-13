@@ -36,13 +36,13 @@ label:
   min_move_bps: 3       # ลดเกณฑ์เพื่อจับ small moves ใน 5m timeframe
 
 # ================================
-# การแบ่งข้อมูล (Data Splitting)
+# การแบ่งข้อมูล (Data Splitting) - ULTRA ADAPTIVE
 # ================================
 split:
-  train_months: 18      # ลดลงเพื่อให้ model ปรับตัวเร็วกับ market regime changes
-  valid_months: 3       # ใช้ข้อมูล 3 เดือนสำหรับการ validation
-  test_months: 3        # ใช้ข้อมูล 3 เดือนสำหรับการทดสอบ/เทรด
-  step_months: 3        # เลื่อนหน้าต่างข้อมูลทุก 3 เดือน (Walk-Forward optimal)
+  train_months: 6       # ลดเป็น 6 เดือนเพื่อ high adaptability
+  valid_months: 1       # ลดเป็น 1 เดือนเพื่อ fast validation
+  test_months: 1        # ลดเป็น 1 เดือนเพื่อ quick testing
+  step_months: 1        # เลื่อนทุกเดือนเพื่อ maximum adaptation
 
 # ================================
 # การเทรนโมเดล (Model Training)
