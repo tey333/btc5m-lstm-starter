@@ -22,61 +22,68 @@ data:
 # ================================
 feature:
   rsi_period: 14                         # ช่วงเวลาการคำนวณ RSI (Relative Strength Index)
-  ema_periods: [20, 50, 200]            # ช่วงเวลา EMA (Exponential Moving Average) หลายเส้น
+  ema_periods: [8, 21, 55, 144]          # EMA Fibonacci sequence: เหมาะกับ crypto volatility
   atr_period: 14                         # ช่วงเวลาการคำนวณ ATR (Average True Range)
-  return_lags: [1,3,6,12,24,48,96]      # ระยะย้อนหลังของ log return (1=5นาที, 96=8ชั่วโมง)
+  return_lags: [1,2,3,6,12,24,48,96,144] # เพิ่ม short-term patterns สำหรับ 5m timeframe
 
 # ================================
 # การติดป้ายข้อมูล (Labeling)
 # ================================
 label:
-  atr_mult_tp: 2.8      # ตัวคูณ ATR สำหรับ Take Profit (กำไร = 2.0 x ATR)
-  atr_mult_sl: 1.4      # ตัวคูณ ATR สำหรับ Stop Loss (ขาดทุน = 1.0 x ATR) - RR 1:2
-  max_holding: 36       # ระยะเวลาถือครองสูงสุด (36 periods = 3 ชั่วโมง)
-  min_move_bps: 5       # การเคลื่อนไหวขั้นต่ำที่ถือว่าเป็นสัญญาณ (5 basis points = 0.05%)
+  atr_mult_tp: 2.5      # ตัวคูณ ATR สำหรับ Take Profit (เหมาะกับ BTC volatility)
+  atr_mult_sl: 1.25     # ตัวคูณ ATR สำหรับ Stop Loss (RR = 1:2, conservative)
+  max_holding: 48       # ระยะเวลาถือครองสูงสุด (48 periods = 4 ชั่วโมง, เหมาะกับ intraday)
+  min_move_bps: 3       # ลดเกณฑ์เพื่อจับ small moves ใน 5m timeframe
 
 # ================================
 # การแบ่งข้อมูล (Data Splitting)
 # ================================
 split:
-  train_months: 36      # ใช้ข้อมูล 36 เดือนสำหรับการเทรนโมเดล (ลดเป็น 3-6 สำหรับการทดสอบ)
-  valid_months: 3       # ใช้ข้อมูล 3 เดือนสำหรับการ validation (ลดเป็น 1 สำหรับการทดสอบ)
-  test_months: 3        # ใช้ข้อมูล 3 เดือนสำหรับการทดสอบ/เทรด (ลดเป็น 1 สำหรับการทดสอบ)
-  step_months: 3        # เลื่อนหน้าต่างข้อมูลทุก 3 เดือน (Walk-Forward)
+  train_months: 18      # ลดลงเพื่อให้ model ปรับตัวเร็วกับ market regime changes
+  valid_months: 3       # ใช้ข้อมูล 3 เดือนสำหรับการ validation
+  test_months: 3        # ใช้ข้อมูล 3 เดือนสำหรับการทดสอบ/เทรด
+  step_months: 3        # เลื่อนหน้าต่างข้อมูลทุก 3 เดือน (Walk-Forward optimal)
 
 # ================================
 # การเทรนโมเดล (Model Training)
 # ================================
 train:
-  seq_len: 96                     # ความยาวของ sequence สำหรับ LSTM (96 = 8 ชั่วโมง)
-  batch_size: 1536               # จำนวนตัวอย่างใน batch หนึ่ง (เหมาะสำหรับ GPU L4 24GB)
-  lr: 0.001                       # Learning rate (อัตราการเรียนรู้)
-  max_epochs: 25                 # จำนวน epoch สูงสุด (ลดเป็น 5-10 สำหรับการทดสอบ)
-  early_stop_patience: 5         # หยุดการเทรนหากไม่มีการปรับปรุงใน 5 epochs
-  class_weights: [1.0, 0.6, 1.0] # น้ำหนักของแต่ละคลาส [-1=Short, 0=Neutral, +1=Long]
-  device: "cuda"                 # ใช้ GPU ("cuda") หรือ CPU ("cpu") - เปลี่ยนเป็น "cpu" หากไม่มี GPU
+  seq_len: 144                    # เพิ่มเป็น 144 (12 ชั่วโมง) เพื่อจับ daily patterns
+  batch_size: 1024               # ลดลงเล็กน้อยเพื่อ stability และ GPU memory
+  lr: 0.0008                     # ลด learning rate เล็กน้อยเพื่อการเทรนที่เสถียร
+  max_epochs: 30                 # เพิ่มเพื่อให้ model เรียนรู้ได้ดีขึ้น
+  early_stop_patience: 8         # เพิ่ม patience เพื่อหลีกเลี่ยง premature stopping
+  class_weights: [1.2, 0.5, 1.2] # เพิ่มน้ำหนัก Long/Short, ลด Neutral เพื่อการเทรดที่ active
+  device: "cuda"                 # ใช้ GPU ("cuda") หรือ CPU ("cpu")
 
 # ================================
 # การตั้งค่าการเทรด (Trading Configuration)
 # ================================
 trade:
-  proba_threshold: 0.60   # เกณฑ์ความมั่นใจขั้นต่ำในการเปิดออเดอร์ (60% - เพิ่มขึ้นเพื่อความระมัดระวัง)
+  proba_threshold: 0.65   # เพิ่มขึ้นเพื่อ selectivity ที่ดีขึ้น (trade quality > quantity)
   fee_bps: 5             # ค่าธรรมเนียมการเทรด (5 basis points = 0.05%)
   slippage_bps: 2        # Slippage ที่คาดหวัง (2 basis points = 0.02%)
-  atr_mult_tp: 2.8       # ตัวคูณ ATR สำหรับ Take Profit (RR 1:2)
-  atr_mult_sl: 1.4       # ตัวคูณ ATR สำหรับ Stop Loss (RR 1:2)
-  max_holding: 36        # ระยะเวลาถือครองสูงสุดต่อออเดอร์ (36 periods = 3 ชั่วโมง)
+  atr_mult_tp: 2.5       # ตัวคูณ ATR สำหรับ Take Profit (สอดคล้องกับ label)
+  atr_mult_sl: 1.25      # ตัวคูณ ATR สำหรับ Stop Loss (RR = 1:2)
+  max_holding: 48        # ระยะเวลาถือครองสูงสุดต่อออเดอร์ (48 periods = 4 ชั่วโมง)
 
 # ================================
 # คำแนะนำการใช้งาน:
 # 
 # การทดสอบเร็ว:
-# - train_months: 3, valid_months: 1, test_months: 1
-# - max_epochs: 5, batch_size: 256, device: "cpu"
+# - train_months: 6, valid_months: 1, test_months: 1
+# - max_epochs: 10, batch_size: 512, seq_len: 96
 #
-# การเทรนจริง:
-# - ใช้ค่าปัจจุบัน (แนะนำ GPU)
-# - ตรวจสอบ GPU memory หาก batch_size ใหญ่เกินไป
+# การเทรนจริง (OPTIMIZED):
+# - train_months: 18 (เหมาะกับ market regime changes)
+# - seq_len: 144 (12 ชั่วโมง, จับ daily patterns)
+# - class_weights: [1.2, 0.5, 1.2] (เน้น directional trades)
+# - proba_threshold: 0.65 (high confidence trades)
+# - RR: 1:2 (atr_mult_tp: 2.5, atr_mult_sl: 1.25)
+#
+# สำหรับ GPU L4:
+# - batch_size: 1024 (เสถียรและเร็ว)
+# - max_epochs: 30 (convergence ที่ดี)
 #
 # รันคำสั่ง:
 # python -m scripts.run_train
