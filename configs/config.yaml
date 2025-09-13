@@ -63,8 +63,8 @@ trade:
   proba_threshold: 0.60   # เกณฑ์ความมั่นใจขั้นต่ำในการเปิดออเดอร์ (60% - เพิ่มขึ้นเพื่อความระมัดระวัง)
   fee_bps: 5             # ค่าธรรมเนียมการเทรด (5 basis points = 0.05%)
   slippage_bps: 2        # Slippage ที่คาดหวัง (2 basis points = 0.02%)
-  atr_mult_tp: 2.0       # ตัวคูณ ATR สำหรับ Take Profit (RR 1:2)
-  atr_mult_sl: 1.0       # ตัวคูณ ATR สำหรับ Stop Loss (RR 1:2)
+  atr_mult_tp: 2.8       # ตัวคูณ ATR สำหรับ Take Profit (RR 1:2)
+  atr_mult_sl: 1.4       # ตัวคูณ ATR สำหรับ Stop Loss (RR 1:2)
   max_holding: 36        # ระยะเวลาถือครองสูงสุดต่อออเดอร์ (36 periods = 3 ชั่วโมง)
 
 # ================================
