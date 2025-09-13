@@ -1,0 +1,249 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+.pybuilder/
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# poetry
+poetry.lock
+
+# pdm
+.pdm.toml
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# ========================================
+# Project Specific
+# ========================================
+
+# Data files (exclude large datasets)
+data/raw/*.csv
+data/raw/*.parquet
+data/raw/*.json
+data/prepared/*.csv
+data/prepared/*.parquet
+data/prepared/*.json
+
+# Keep sample data and structure
+!data/sample/
+!data/raw/.gitkeep
+!data/prepared/.gitkeep
+
+# Model outputs
+outputs/models/*.pt
+outputs/models/*.pth
+outputs/models/*.npy
+outputs/models/*.pkl
+outputs/models/*.joblib
+
+# Trading results
+outputs/trades/*.parquet
+outputs/trades/*.csv
+outputs/metrics/*.json
+
+# Keep output structure
+!outputs/models/.gitkeep
+!outputs/trades/.gitkeep
+!outputs/metrics/.gitkeep
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+temp/
+tmp/
+*.tmp
+
+# Backup files
+*.bak
+*.backup
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows specific
+desktop.ini
+$RECYCLE.BIN/
+
+# Linux specific
+*~
+
+# API keys and secrets
+*.key
+secrets.yaml
+config_secret.yaml
+.env.local
+.env.production
+
+# Analysis scripts (temporary)
+analyze_*.py
+test_*.py
+debug_*.py
+scratch_*.py
+
+# Jupyter notebooks (if not needed in repo)
+*.ipynb
+
+# Large files
+*.h5
+*.hdf5
+*.zip
+*.tar.gz
+*.rar
+
+# GPU/CUDA related
+*.cu
+*.cuh
+
+# TensorBoard logs
+runs/
+tensorboard_logs/
+
+# MLflow
+mlruns/
+mlartifacts/
+
+# Weights & Biases
+wandb/
+
+# DVC
+.dvc/
+*.dvc
+
+# Custom analysis files
+results_*.txt
+performance_*.csv
+backtest_*.json

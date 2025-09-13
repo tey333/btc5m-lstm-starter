@@ -3,7 +3,7 @@ from pathlib import Path
 from src.data.load import load_all
 
 def main():
-    cfg = yaml.safe_load(open("configs/config.yaml"))
+    cfg = yaml.safe_load(open("configs/config.yaml", encoding="utf-8"))
     df = load_all(
         cfg["data"]["raw_glob"],
         cfg["data"]["tz_source"],

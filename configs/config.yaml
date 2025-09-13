@@ -1,40 +1,58 @@
+# ================================
+# การตั้งค่าข้อมูล (Data Configuration)
+# ================================
 data:
-  raw_glob: "data/raw/*.*"     # รองรับ .csv หรือ .parquet
-  tz_source: "Asia/Bangkok"    # timezone ต้นทางของไฟล์ดิบ
-  tz_target: "UTC"             # ภายในระบบใช้ UTC
-  ensure_regular_5m: true      # เติมกริดเวลา 5 นาทีให้สม่ำเสมอ
+  raw_glob: "data/raw/*.*"     # ไฟล์ข้อมูลดิบ รองรับ .csv หรือ .parquet
+  tz_source: "Asia/Bangkok"    # timezone ของข้อมูลต้นฉบับ (เปลี่ยนตามต้องการ)
+  tz_target: "UTC"             # แปลงเป็น UTC สำหรับการประมวลผลภายใน
+  ensure_regular_5m: true      # เติมช่องว่างให้ข้อมูลเป็น 5 นาทีสม่ำเสมอ
 
+# ================================
+# การสร้างฟีเจอร์ (Feature Engineering)
+# ================================
 feature:
-  rsi_period: 14
-  ema_periods: [20, 50, 200]
-  atr_period: 14
-  return_lags: [1,3,6,12,24,48,96]  # จำนวนแท่งย้อนหลังของ logret
+  rsi_period: 14                         # ช่วงเวลาการคำนวณ RSI (Relative Strength Index)
+  ema_periods: [20, 50, 200]            # ช่วงเวลา EMA (Exponential Moving Average) หลายเส้น
+  atr_period: 14                         # ช่วงเวลาการคำนวณ ATR (Average True Range)
+  return_lags: [1,3,6,12,24,48,96]      # ระยะย้อนหลังของ log return (1=5นาที, 96=8ชั่วโมง)
 
+# ================================
+# การติดป้ายข้อมูล (Labeling)
+# ================================
 label:
-  atr_mult_tp: 2.5
-  atr_mult_sl: 1.6
-  max_holding: 36
-  min_move_bps: 0
+  atr_mult_tp: 2.8      # ตัวคูณ ATR สำหรับ Take Profit (กำไร = 2.8 x ATR)
+  atr_mult_sl: 1.4      # ตัวคูณ ATR สำหรับ Stop Loss (ขาดทุน = 1.4 x ATR)
+  max_holding: 36       # ระยะเวลาถือครองสูงสุด (36 periods = 3 ชั่วโมง)
+  min_move_bps: 0       # การเคลื่อนไหวขั้นต่ำที่ถือว่าเป็นสัญญาณ (basis points)
 
+# ================================
+# การแบ่งข้อมูล (Data Splitting)
+# ================================
 split:
-  train_months: 12
-  valid_months: 3
-  test_months: 3
-  step_months: 3
+  train_months: 3      # ใช้ข้อมูล 3 เดือนสำหรับการเทรนโมเดล (ลดลงเพื่อทดสอบ)
+  valid_months: 1       # ใช้ข้อมูล 1 เดือนสำหรับการ validation
+  test_months: 1        # ใช้ข้อมูล 1 เดือนสำหรับการทดสอบ/เทรด
+  step_months: 3        # เลื่อนหน้าต่างข้อมูลทุก 3 เดือน (Walk-Forward)
 
+# ================================
+# การเทรนโมเดล (Model Training)
+# ================================
 train:
-  seq_len: 96
-  batch_size: 1024
-  lr: 1e-3
-  max_epochs: 25
-  early_stop_patience: 5
-  class_weights: [1.0, 0.6, 1.0]   # [-1, 0, +1]
-  device: "cuda"                   # หรือ "cpu"
+  seq_len: 96                     # ความยาวของ sequence สำหรับ LSTM (96 = 8 ชั่วโมง)
+  batch_size: 256               # จำนวนตัวอย่างใน batch หนึ่ง (ลดลงเพื่อทดสอบ)
+  lr: 0.001                       # Learning rate (อัตราการเรียนรู้)
+  max_epochs: 2                 # จำนวน epoch สูงสุด (ลดลงเพื่อทดสอบ)
+  early_stop_patience: 5         # หยุดการเทรนหากไม่มีการปรับปรุงใน 5 epochs
+  class_weights: [1.0, 0.6, 1.0] # น้ำหนักของแต่ละคลาส [-1=Short, 0=Neutral, +1=Long]
+  device: "cpu"                 # ใช้ GPU ("cuda") หรือ CPU ("cpu")
 
+# ================================
+# การตั้งค่าการเทรด (Trading Configuration)
+# ================================
 trade:
-  proba_threshold: 0.55
-  fee_bps: 5            # 0.05%
-  slippage_bps: 2       # 0.02%
-  atr_mult_tp: 2.5
-  atr_mult_sl: 1.6
-  max_holding: 36
+  proba_threshold: 0.55   # เกณฑ์ความมั่นใจขั้นต่ำในการเปิดออเดอร์ (55%)
+  fee_bps: 5             # ค่าธรรมเนียมการเทรด (5 basis points = 0.05%)
+  slippage_bps: 2        # Slippage ที่คาดหวัง (2 basis points = 0.02%)
+  atr_mult_tp: 2.5       # ตัวคูณ ATR สำหรับ Take Profit
+  atr_mult_sl: 1.6       # ตัวคูณ ATR สำหรับ Stop Loss
+  max_holding: 36        # ระยะเวลาถือครองสูงสุดต่อออเดอร์ (36 periods = 3 ชั่วโมง)

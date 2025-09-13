@@ -67,8 +67,9 @@ def train_one_window(cfg: dict, df: pd.DataFrame, feat_cols: list, tr_idx, va_id
             if bad>=cfg["train"]["early_stop_patience"]:
                 break
 
-    # load best
-    model.load_state_dict(best_state)
+    # load best (if we have a best state, otherwise keep current)
+    if best_state is not None:
+        model.load_state_dict(best_state)
     model.eval()
 
     # logits on test
@@ -82,7 +83,7 @@ def train_one_window(cfg: dict, df: pd.DataFrame, feat_cols: list, tr_idx, va_id
     return model.cpu(), scaler, proba
 
 def run(cfg_path="configs/config.yaml"):
-    cfg = yaml.safe_load(open(cfg_path))
+    cfg = yaml.safe_load(open(cfg_path, encoding="utf-8"))
 
     # Load prepared data
     df = pd.read_parquet("data/prepared/btc_5m_clean.parquet").sort_values("timestamp")
@@ -96,6 +97,10 @@ def run(cfg_path="configs/config.yaml"):
         cfg["label"]["max_holding"],
         cfg["label"].get("min_move_bps", 0)
     )
+    
+    # Convert labels from {-1, 0, 1} to {0, 1, 2} for PyTorch
+    df["target"] = df["target"] + 1
+    
     df = df.dropna().reset_index(drop=True)
 
     drop_cols = {"timestamp","open","high","low","close","volume","target"}
@@ -132,8 +137,10 @@ def run(cfg_path="configs/config.yaml"):
 
         # save artifacts
         torch.save(model.state_dict(), out_models / f"lstm_w{k}.pt")
-        np.save(out_models / f"scaler_mean_w{k}.npy", scaler.mean_)
-        np.save(out_models / f"scaler_std_w{k}.npy", scaler.std_)
+        if hasattr(scaler, 'mean_') and scaler.mean_ is not None:
+            np.save(out_models / f"scaler_mean_w{k}.npy", scaler.mean_)
+        if hasattr(scaler, 'std_') and scaler.std_ is not None:
+            np.save(out_models / f"scaler_std_w{k}.npy", scaler.std_)
         trades.to_parquet(out_trades / f"trades_w{k}.parquet", index=False)
         k += 1
 
