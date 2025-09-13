@@ -11,10 +11,11 @@ import sys
 import os
 
 # เพิ่ม src ใน Python path
-sys.path.append(str(Path(__file__).parent / "src"))
+src_path = Path(__file__).parent / "src"
+sys.path.append(str(src_path.resolve()))
 
 try:
-    from utils.splits import time_splits
+    from src.utils.splits import time_splits
     USE_REAL_SPLITS = True
 except ImportError:
     print("⚠️ ไม่สามารถ import time_splits ได้ จะใช้การคำนวณแบบประมาณ")
