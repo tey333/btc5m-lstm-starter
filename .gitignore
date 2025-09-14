@@ -215,7 +215,7 @@ debug_*.py
 scratch_*.py
 
 # Jupyter notebooks (if not needed in repo)
-*.ipynb
+#*.ipynb
 
 # Large files
 *.h5
